@@ -14,6 +14,6 @@ class Article(models.Model):
 
 
 class Author(models.Model):
-    name = models.CharField(max_length=200)
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name="author_name")
     articles = models.ManyToManyField(Article)
 

@@ -10,12 +10,14 @@ from django.contrib.auth import(
 from django.template.context_processors import csrf
 from django.contrib.auth.decorators import login_required
 
-
+@login_required
 def article_view(request):
     if request.method == "POST":
         form = ArticleForm(request.POST)
         if form.is_valid():
-            form.save()
+            article = form.save()
+            author = Author.objects.get(user=request.user)
+            article.author_set.add(author)
             return redirect(reverse("blogapp:home"))
 
     else:
@@ -24,9 +26,15 @@ def article_view(request):
     return render(request, "blogapp/blogcreate.html", context)
 
 def home_view(request):
-    articles = Article.objects.all()
-    context={"articles":articles}
-    return render(request, "blogapp/home.html", context)
+    if request.user.is_authenticated:
+        author = Author.objects.get(user=request.user)
+        articles = Article.objects.exclude(author=author)
+        context={"articles":articles}
+        return render(request, "blogapp/home.html", context)
+    else:
+        articles=Article.objects.all()
+        context={"articles":articles}
+        return render(request, "blogapp/home.html", context)
 
 
 def article_detail(request, the_slug):
@@ -35,20 +43,7 @@ def article_detail(request, the_slug):
     context = {"article":article, "authors":authors}
     return render(request, "blogapp/article_detail.html", context)
 
-def author_view(request):
-    if request.method == "POST":
-        form = AuthorForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect(reverse("blogapp:home"))
-
-    else:
-        form = AuthorForm()
-    context = {"form": form}
-    return render(request, "blogapp/blogcreate.html", context)
-
-
-
+    
 def delete_article(request, article_id):
     article= Article.objects.get(id=article_id)
     article.delete()
@@ -70,12 +65,15 @@ def update_article(request,article_id):
 
 def signup_view(request):
     form = SignUpForm(request.POST or None) 
+
     if form.is_valid():  
         user = form.save(commit=False)
         password = form.cleaned_data.get('password') 
         user.set_password(password)
         user.save()
+    
         new_user = authenticate(username=user.username, password=password)
+        author = Author.objects.create(user=new_user)
         login(request, new_user)
         return redirect("blogapp:home")
 
@@ -100,3 +98,11 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect(reverse("blogapp:home"))
+
+
+def user_article(request):
+    author = Author.objects.get(user=request.user)
+    articles = Article.objects.filter(author=author)
+    context = {"articles":articles}
+    return render(request, "blogapp/user_article_list.html", context)
+
