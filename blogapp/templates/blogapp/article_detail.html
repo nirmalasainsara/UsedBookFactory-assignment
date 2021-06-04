@@ -1,0 +1,8 @@
+<a href="{% url 'blogapp:update' article.id  %}">Edit</a>
+<a href="{% url 'blogapp:delete' article.id  %}">Delete</a><br>
+{% for author in authors %}
+{% csrf_token %}
+AuthorName : {{ author.name }}<br>
+{% endfor %}
+ArticleTitle : {{ article.title }}<br>
+ArticleDescription : {{ article.description }}<br>
