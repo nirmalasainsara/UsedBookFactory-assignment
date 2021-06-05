@@ -46,7 +46,16 @@ def home_view(request):
 def article_detail(request, the_slug):
     article = Article.objects.get(slug=the_slug)
     authors = article.author_set.all()
-    context = {"article":article, "authors":authors}
+    qs=authors.values_list("user", flat=True)
+    flag=False
+    for item in qs:
+        if item == request.user.id:
+            flag = True
+    has_permission = False
+    if request.user.is_authenticated and flag:
+        has_permission =True
+    
+    context = {"article":article, "authors":authors, "has_permission":has_permission}
     return render(request, "blogapp/article_detail.html", context)
 
     

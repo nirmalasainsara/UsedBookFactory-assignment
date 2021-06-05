@@ -1,5 +1,7 @@
+{% if has_permission %}
 <a href="{% url 'blogapp:update' article.id  %}">Edit</a>
 <a href="{% url 'blogapp:delete' article.id  %}">Delete</a><br>
+{% endif %}
 {% for author in authors %}
 {% csrf_token %}
 AuthorName : {{ author.user.username }}<br>
