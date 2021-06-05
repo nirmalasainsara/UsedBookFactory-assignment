@@ -11,6 +11,8 @@ from django.contrib.auth import(
 )
 User = get_user_model()
 
+
+# Article form
 class ArticleForm(forms.ModelForm):
     class Meta:
         model = Article
@@ -20,12 +22,14 @@ class ArticleForm(forms.ModelForm):
         )
 
 
+# Author form
 class AuthorForm(forms.ModelForm):
     class Meta:
         model = Author
         fields = "__all__"
 
 
+# user signup form
 class SignUpForm(forms.ModelForm): 
     email = forms.EmailField(label='Email Address')
     email2 = forms.EmailField(label='Confirm Email')
@@ -50,6 +54,7 @@ class SignUpForm(forms.ModelForm):
         return email
 
 
+# user login form
 class LoginForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput)

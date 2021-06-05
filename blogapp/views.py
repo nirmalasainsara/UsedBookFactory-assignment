@@ -10,6 +10,8 @@ from django.contrib.auth import(
 from django.template.context_processors import csrf
 from django.contrib.auth.decorators import login_required
 
+
+# create article if user login.
 @login_required
 def article_view(request):
     if request.method == "POST":
@@ -25,6 +27,8 @@ def article_view(request):
     context = {"form": form}
     return render(request, "blogapp/blogcreate.html", context)
 
+
+# home page where we can check list of article.
 def home_view(request):
     if request.user.is_authenticated:
         author = Author.objects.get(user=request.user)
@@ -37,6 +41,8 @@ def home_view(request):
         return render(request, "blogapp/home.html", context)
 
 
+
+#  article detail  
 def article_detail(request, the_slug):
     article = Article.objects.get(slug=the_slug)
     authors = article.author_set.all()
@@ -44,12 +50,14 @@ def article_detail(request, the_slug):
     return render(request, "blogapp/article_detail.html", context)
 
     
+# delete article page view.
 def delete_article(request, article_id):
     article= Article.objects.get(id=article_id)
     article.delete()
     return redirect(reverse("blogapp:home"))
 
 
+# Edit article view
 def update_article(request,article_id):
     article = Article.objects.get(id=article_id)
     if request.method == "POST":
@@ -63,6 +71,8 @@ def update_article(request,article_id):
         form = ArticleForm(instance=article)
         return render(request, "blogapp/blogcreate.html", {"article": article, "form": form})
 
+
+# user signup page for blogapp.
 def signup_view(request):
     form = SignUpForm(request.POST or None) 
 
@@ -83,6 +93,7 @@ def signup_view(request):
     return render(request, "blogapp/blogcreate.html", context)
 
 
+# user login page 
 def login_view(request):
     form = LoginForm(request.POST or None) 
     if form.is_valid():  
@@ -100,6 +111,7 @@ def logout_view(request):
     return redirect(reverse("blogapp:home"))
 
 
+# The user who created article by yourself.
 def user_article(request):
     author = Author.objects.get(user=request.user)
     articles = Article.objects.filter(author=author)
